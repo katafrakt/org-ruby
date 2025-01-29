@@ -1,8 +1,6 @@
 module Orgmode
-
   # Represents a headline in an orgmode file.
   class Headline < Line
-
     # This is the "level" of the headline
     attr_reader :level
 
@@ -40,22 +38,22 @@ module Orgmode
     # Special keywords allowed at the start of a line.
     Keywords = %w[TODO DONE]
 
-    KeywordsRegexp = Regexp.new("^(#{Keywords.join('|')})\$")
+    KeywordsRegexp = Regexp.new("^(#{Keywords.join("|")})$")
 
     # This matches a headline marked as COMMENT
     CommentHeadlineRegexp = /^COMMENT\s+/
 
-    def initialize(line, parser = nil, offset=0)
+    def initialize(line, parser = nil, offset = 0)
       super(line, parser)
       @body_lines = []
       @tags = []
       @export_state = :exclude
-      @property_drawer = { }
-      if (@line =~ LineRegexp) then
+      @property_drawer = {}
+      if @line =~ LineRegexp
         @level = $&.strip.length + offset
         @headline_text = $'.strip
-        if (@headline_text =~ TagsRegexp) then
-          @tags = $&.split(/:/)              # split tag text on semicolon
+        if @headline_text =~ TagsRegexp
+          @tags = $&.split(":")              # split tag text on semicolon
           @tags.delete_at(0)                 # the first item will be empty; discard
           @headline_text.gsub!(TagsRegexp, "") # Removes the tags from the headline
         end
@@ -69,7 +67,7 @@ module Orgmode
     # Override Line.output_text. For a heading, @headline_text
     # is what we should output.
     def output_text
-      return @headline_text
+      @headline_text
     end
 
     # Determines if a line is an orgmode "headline":
@@ -95,7 +93,7 @@ module Orgmode
       re = @parser.custom_keyword_regexp if @parser
       re ||= KeywordsRegexp
       words = @headline_text.split
-      if words.length > 0 && words[0] =~ re then
+      if words.length > 0 && words[0] =~ re
         @keyword = words[0]
         @headline_text.sub!(Regexp.new("^#{@keyword}\s*"), "")
       end

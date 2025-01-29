@@ -1,7 +1,6 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Orgmode::OutputBuffer do
-
   it "computes outline level numbering" do
     output_buffer = Orgmode::OutputBuffer.new ""
     expect(output_buffer.get_next_headline_number(1)).to eql("1")
@@ -15,5 +14,4 @@ describe Orgmode::OutputBuffer do
     expect(output_buffer.get_next_headline_number(2)).to eql("5.2")
     expect(output_buffer.get_next_headline_number(4)).to eql("5.2.0.1")
   end
-
 end

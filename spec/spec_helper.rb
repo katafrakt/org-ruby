@@ -1,4 +1,4 @@
-require 'org-ruby'
+require "org-ruby"
 
 RememberFile = File.join(File.dirname(__FILE__), %w[data remember.org])
 FreeformFile = File.join(File.dirname(__FILE__), %w[data freeform.org])

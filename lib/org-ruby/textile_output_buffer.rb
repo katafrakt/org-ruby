@@ -1,29 +1,27 @@
-require 'stringio'
+require "stringio"
 
 module Orgmode
-
   class TextileOutputBuffer < OutputBuffer
-
     def initialize(output)
-      super(output)
+      super
       @add_paragraph = true
       @support_definition_list = true # TODO this should be an option
       @footnotes = []
     end
 
-    def push_mode(mode, indent, properties={})
-      super(mode, indent, properties)
+    def push_mode(mode, indent, properties = {})
+      super
       @output << "bc. " if mode_is_code? mode
-      if mode == :center or mode == :quote
+      if (mode == :center) || (mode == :quote)
         @add_paragraph = false
         @output << "\n"
       end
     end
 
     def pop_mode(mode = nil)
-      m = super(mode)
+      m = super
       @list_indent_stack.pop
-      if m == :center or m == :quote
+      if (m == :center) || (m == :quote)
         @add_paragraph = true
         @output << "\n"
       end
@@ -47,9 +45,9 @@ module Orgmode
         "#{m}#{body}#{m}"
       end
       @re_help.rewrite_subp input do |type, text|
-        if type == "_" then
+        if type == "_"
           "~#{text}~"
-        elsif type == "^" then
+        elsif type == "^"
           "^#{text}^"
         end
       end
@@ -63,10 +61,10 @@ module Orgmode
 
         # We don't add a description for images in links, because its
         # empty value forces the image to be inlined.
-        defi ||= link unless link =~ @re_help.org_image_file_regexp
+        defi ||= link unless link&.match?(@re_help.org_image_file_regexp)
         link = link.gsub(/ /, "%%20")
 
-        if defi =~ @re_help.org_image_file_regexp
+        if defi&.match?(@re_help.org_image_file_regexp)
           defi = "!#{defi}(#{defi})!"
         elsif defi
           defi = "\"#{defi}\""
@@ -81,21 +79,20 @@ module Orgmode
       @re_help.rewrite_footnote input do |name, definition|
         # textile only support numerical names, so we need to do some conversion
         # Try to find the footnote and use its index
-        footnote = @footnotes.select {|f| f[:name] == name }.first
+        footnote = @footnotes.find { |f| f[:name] == name }
         if footnote
           # The latest definition overrides other ones
-          footnote[:definition] = definition if definition and not footnote[:definition]
+          footnote[:definition] = definition if definition && !(footnote[:definition])
         else
           # There is no footnote with the current name so we add it
-          footnote = { :name => name, :definition => definition }
+          footnote = {name: name, definition: definition}
           @footnotes << footnote
         end
 
         "[#{@footnotes.index(footnote)}]"
       end
       Orgmode.special_symbols_to_textile(input)
-      input = @re_help.restore_code_snippets input
-      input
+      @re_help.restore_code_snippets input
     end
 
     def output_footnotes!
@@ -103,23 +100,22 @@ module Orgmode
 
       @footnotes.each do |footnote|
         index = @footnotes.index(footnote)
-        @output << "\nfn#{index}. #{footnote[:definition] || 'DEFINITION NOT FOUND' }\n"
+        @output << "\nfn#{index}. #{footnote[:definition] || "DEFINITION NOT FOUND"}\n"
       end
 
-      return true
+      true
     end
 
     # Flushes the current buffer
     def flush!
-      return false if @buffer.empty? and @output_type != :blank
+      return false if @buffer.empty? && (@output_type != :blank)
       @logger.debug "FLUSH ==========> #{@output_type}"
       @buffer.gsub!(/\A\n*/, "")
 
-      case
-      when preserve_whitespace?
+      if preserve_whitespace?
         @output << @buffer << "\n"
 
-      when @output_type == :blank
+      elsif @output_type == :blank
         @output << "\n"
 
       else

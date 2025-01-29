@@ -1,7 +1,6 @@
-require 'logger'
+require "logger"
 
 module Orgmode
-
   # = Summary
   #
   # This class contains helper routines to deal with the Regexp "black
@@ -18,7 +17,6 @@ module Orgmode
   # * Use +rewrite_images+ to rewrite all inline image links with suitable
   #   markup for the output.
   class RegexpHelper
-
     ######################################################################
     # EMPHASIS
     #
@@ -47,13 +45,15 @@ module Orgmode
       @pre_emphasis = ' \t\(\'"\{'
       @post_emphasis = '- \t\.,:!\?;\'"\)\}\\\\'
       @border_forbidden = ' \t\r\n'
-      @body_regexp = '.*?'
+      @body_regexp = ".*?"
       @max_newlines = 1
-      @body_regexp = "#{@body_regexp}" +
-                     "(?:\\n#{@body_regexp}){0,#{@max_newlines}}" if @max_newlines > 0
+      if @max_newlines > 0
+        @body_regexp = "#{@body_regexp}" \
+          "(?:\\n#{@body_regexp}){0,#{@max_newlines}}"
+      end
       @markers = '\*\/_=~\+'
       @code_snippet_stack = []
-      @logger = Logger.new(STDERR)
+      @logger = Logger.new($stderr)
       @logger.level = Logger::WARN
       build_org_emphasis_regexp
       build_org_link_regexp
@@ -93,19 +93,18 @@ module Orgmode
     # syntax, assuming +map+ is defined appropriately.)
     def rewrite_emphasis str
       # escape the percent signs for safe restoring code snippets
-      str.gsub!(/%/, "%%")
+      str.gsub!("%", "%%")
       format_str = "%s"
       str.gsub! @org_emphasis_regexp do |match|
         pre = $1
         # preserve the code snippet from further formatting
-        if $2 == "=" or $2 == "~"
-          inner = yield $2, $3
+        inner = yield $2, $3
+        if ($2 == "=") || ($2 == "~")
           # code is not formatted, so turn to single percent signs
-          inner.gsub!(/%%/, "%")
+          inner.gsub!("%%", "%")
           @code_snippet_stack.push inner
           "#{pre}#{format_str}"
         else
-          inner = yield $2, $3
           "#{pre}#{inner}"
         end
       end
@@ -168,7 +167,7 @@ module Orgmode
     end
 
     def restore_code_snippets str
-      str = str % @code_snippet_stack
+      str %= @code_snippet_stack
       @code_snippet_stack = []
       str
     end
@@ -176,11 +175,11 @@ module Orgmode
     private
 
     def build_org_emphasis_regexp
-      @org_emphasis_regexp = Regexp.new("([#{@pre_emphasis}]|^)" +
-                                        "([#{@markers}])(?!\\2)" +
-                                        "([^#{@border_forbidden}]|" +
-                                        "[^#{@border_forbidden}]#{@body_regexp}" +
-                                        "[^#{@border_forbidden}])\\2" +
+      @org_emphasis_regexp = Regexp.new("([#{@pre_emphasis}]|^)" \
+                                        "([#{@markers}])(?!\\2)" \
+                                        "([^#{@border_forbidden}]|" \
+                                        "[^#{@border_forbidden}]#{@body_regexp}" \
+                                        "[^#{@border_forbidden}])\\2" \
                                         "(?=[#{@post_emphasis}]|$)")
       @logger.debug "Just created regexp: #{@org_emphasis_regexp}"
     end

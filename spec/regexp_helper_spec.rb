@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Orgmode::RegexpHelper do
   it "should recognize simple markup" do
@@ -14,7 +14,7 @@ describe Orgmode::RegexpHelper do
     total = 0
     borders = %w[* / ~]
     strings = %w[bold italic verbatim]
-    e.match_all("This string contains *bold*, /italic/, and ~verbatim~ text.")\
+    e.match_all("This string contains *bold*, /italic/, and ~verbatim~ text.") \
     do |border, str|
       expect(border).to eql(borders[total])
       expect(str).to eql(strings[total])
@@ -50,7 +50,7 @@ describe Orgmode::RegexpHelper do
 
   it "should allow link rewriting" do
     e = Orgmode::RegexpHelper.new
-    str = e.rewrite_links("[[http://www.bing.com]]") do |link,text|
+    str = e.rewrite_links("[[http://www.bing.com]]") do |link, text|
       text ||= link
       "\"#{text}\":#{link}"
     end

@@ -1,7 +1,6 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Orgmode::Headline do
-
   it "should recognize headlines that start with asterisks" do
     expect(Orgmode::Headline.headline?("*** test\n")).to be_truthy
   end
@@ -61,4 +60,3 @@ describe Orgmode::Headline do
     expect(h.comment_headline?).to_not be_nil
   end
 end
-

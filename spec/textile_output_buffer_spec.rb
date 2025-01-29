@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Orgmode::TextileOutputBuffer do
   it "should substitute / with _" do

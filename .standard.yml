@@ -1,0 +1,4 @@
+ignore:
+  - '**/*':
+    - Naming/ConstantName
+    - Style/UnlessLogicalOperators
