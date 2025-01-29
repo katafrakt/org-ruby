@@ -1,8 +1,6 @@
 module Orgmode
-
   # Represents a single line of an orgmode file.
   class Line
-
     # The indent level of this line. this is important to properly translate
     # nested lists from orgmode to textile.
     # TODO 2009-12-20 bdewey: Handle tabs
@@ -27,13 +25,13 @@ module Orgmode
     # In case more contextual info is needed we can put here
     attr_accessor :properties
 
-    def initialize(line, parser=nil, assigned_paragraph_type=nil)
+    def initialize(line, parser = nil, assigned_paragraph_type = nil)
       @parser = parser
       @line = line
       @indent = 0
       @line =~ /\s*/
       @assigned_paragraph_type = assigned_paragraph_type
-      @properties = { }
+      @properties = {}
       determine_paragraph_type
       determine_major_mode
       extract_properties
@@ -41,14 +39,14 @@ module Orgmode
     end
 
     def to_s
-      return @line
+      @line
     end
 
     # Tests if a line is a comment.
     def comment?
       return @assigned_paragraph_type == :comment if @assigned_paragraph_type
-      return block_type.casecmp("COMMENT") if begin_block? or end_block?
-      return @line =~ /^[ \t]*?#[ \t]/
+      return block_type.casecmp("COMMENT") if begin_block? || end_block?
+      @line =~ /^[ \t]*?#[ \t]/
     end
 
     PropertyDrawerRegexp = /^\s*:(PROPERTIES|END):/i
@@ -120,16 +118,16 @@ module Orgmode
 
     def strip_ordered_list_tag
       line = @line.sub(OrderedListRegexp, "")
-      if line =~ ContinuedOrderedListRegexp
+      if ContinuedOrderedListRegexp.match?(line)
         line = line.sub(ContinuedOrderedListRegexp, "")
       end
-      return line
+      line
     end
 
     def extract_properties
-      if @line =~ OrderedListRegexp
-        line_without_number =  @line.sub(OrderedListRegexp, "")
-        if line_without_number =~ ContinuedOrderedListRegexp
+      if OrderedListRegexp.match?(@line)
+        line_without_number = @line.sub(OrderedListRegexp, "")
+        if ContinuedOrderedListRegexp.match?(line_without_number)
           # Extract the start of the ordered list and store it in
           # properties
           @properties["li"] = line_without_number.match(ContinuedOrderedListRegexp)[1]
@@ -150,11 +148,11 @@ module Orgmode
       return strip_unordered_list_tag if unordered_list?
       return @line.sub(InlineExampleRegexp, "") if inline_example?
       return strip_raw_text_tag if raw_text?
-      return @line
+      @line
     end
 
     def plain_text?
-      not metadata? and not blank? and not plain_list?
+      !metadata? and !blank? and !plain_list?
     end
 
     def table_row?
@@ -182,11 +180,11 @@ module Orgmode
 
     #
     # 1) block delimiters
-    # 2) block type (src, example, html...) 
+    # 2) block type (src, example, html...)
     # 3) switches (e.g. -n -r -l "asdf")
     # 4) header arguments (:hello world)
     #
-    BlockRegexp = /^\s*#\+(BEGIN|END)_(\w*)\s*([0-9A-Za-z_\-]*)?\s*([^\":\n]*\"[^\"\n*]*\"[^\":\n]*|[^\":\n]*)?\s*([^\n]*)?/i
+    BlockRegexp = /^\s*#\+(BEGIN|END)_(\w*)\s*([0-9A-Za-z_\-]*)?\s*([^\":\n]*"[^\"\n*]*"[^\":\n]*|[^\":\n]*)?\s*([^\n]*)?/i
 
     def begin_block?
       @line =~ BlockRegexp && $1 =~ /BEGIN/i
@@ -213,14 +211,14 @@ module Orgmode
     end
 
     def block_header_arguments
-      header_arguments = { }
+      header_arguments = {}
 
       if @line =~ BlockRegexp
         header_arguments_string = $5
-        harray = header_arguments_string.split(' ')
+        harray = header_arguments_string.split(" ")
         harray.each_with_index do |arg, i|
           next_argument = harray[i + 1]
-          if arg =~ /^:/ and not (next_argument.nil? or next_argument =~ /^:/)
+          if arg =~ (/^:/) && !(next_argument.nil? || next_argument =~ (/^:/))
             header_arguments[arg] = next_argument
           end
         end
@@ -231,21 +229,19 @@ module Orgmode
 
     # TODO: COMMENT block should be considered here
     def block_should_be_exported?
-      export_state = block_header_arguments[':exports']
-      case
-      when ['both', 'code', nil, ''].include?(export_state)
+      export_state = block_header_arguments[":exports"]
+      if ["both", "code", nil, ""].include?(export_state)
         true
-      when ['none', 'results'].include?(export_state)
+      elsif ["none", "results"].include?(export_state)
         false
       end
     end
 
     def results_block_should_be_exported?
-      export_state = block_header_arguments[':exports']
-      case
-      when ['results', 'both'].include?(export_state)
+      export_state = block_header_arguments[":exports"]
+      if ["results", "both"].include?(export_state)
         true
-      when ['code', 'none', nil, ''].include?(export_state)
+      elsif ["code", "none", nil, ""].include?(export_state)
         false
       end
     end
@@ -285,7 +281,7 @@ module Orgmode
     # the key and value for the setting.
     def in_buffer_setting?
       return false if @assigned_paragraph_type && @assigned_paragraph_type != :comment
-      if block_given? then
+      if block_given?
         if @line =~ InBufferSettingRegexp
           yield $1, $2
         end
@@ -327,70 +323,69 @@ module Orgmode
     end
 
     def include_file_options
-      [$3, $4] if @line =~ IncludeFileRegexp and !$2.nil?
+      [$3, $4] if @line =~ (IncludeFileRegexp) && !$2.nil?
     end
 
     # Determines the paragraph type of the current line.
     def determine_paragraph_type
-      @paragraph_type = \
-      case
-      when blank?
-        :blank
-      when definition_list? # order is important! A definition_list is also an unordered_list!
-        :definition_term
-      when (ordered_list? or unordered_list?)
-        :list_item
-      when property_drawer_begin_block?
-        :property_drawer_begin_block
-      when property_drawer_end_block?
-        :property_drawer_end_block
-      when property_drawer_item?
-        :property_drawer_item
-      when metadata?
-        :metadata
-      when block_type
-        if block_should_be_exported?
-          case block_type.downcase.to_sym
-          when :center, :comment, :example, :html, :quote, :src
-            block_type.downcase.to_sym
+      @paragraph_type =
+        if blank?
+          :blank
+        elsif definition_list? # order is important! A definition_list is also an unordered_list!
+          :definition_term
+        elsif ordered_list? || unordered_list?
+          :list_item
+        elsif property_drawer_begin_block?
+          :property_drawer_begin_block
+        elsif property_drawer_end_block?
+          :property_drawer_end_block
+        elsif property_drawer_item?
+          :property_drawer_item
+        elsif metadata?
+          :metadata
+        elsif block_type
+          if block_should_be_exported?
+            case block_type.downcase.to_sym
+            when :center, :comment, :example, :html, :quote, :src
+              block_type.downcase.to_sym
+            else
+              :comment
+            end
           else
             :comment
           end
-        else
+        elsif title?
+          :title
+        elsif raw_text? # order is important! Raw text can be also a comment
+          :raw_text
+        elsif comment?
           :comment
+        elsif table_separator?
+          :table_separator
+        elsif table_row?
+          :table_row
+        elsif table_header?
+          :table_header
+        elsif inline_example?
+          :inline_example
+        elsif horizontal_rule?
+          :horizontal_rule
+        else
+          :paragraph
         end
-      when title?
-        :title
-      when raw_text? # order is important! Raw text can be also a comment
-        :raw_text
-      when comment?
-        :comment
-      when table_separator?
-        :table_separator
-      when table_row?
-        :table_row
-      when table_header?
-        :table_header
-      when inline_example?
-        :inline_example
-      when horizontal_rule?
-        :horizontal_rule
-      else :paragraph
-      end
     end
 
     def determine_major_mode
-      @major_mode = \
-      case
-      when definition_list? # order is important! A definition_list is also an unordered_list!
-        :definition_list
-      when ordered_list?
-        :ordered_list
-      when unordered_list?
-        :unordered_list
-      when table?
-        :table
-      end
+      @major_mode =
+        if definition_list? # order is important! A definition_list is also an unordered_list!
+          :definition_list
+        elsif ordered_list?
+          :ordered_list
+        elsif unordered_list?
+          :unordered_list
+        elsif table?
+          :table
+        end
     end
 
     ######################################################################
@@ -414,7 +409,7 @@ module Orgmode
     #              this regexp.
     def check_assignment_or_regexp(assignment, regexp)
       return @assigned_paragraph_type == assignment if @assigned_paragraph_type
-      return @line =~ regexp
+      @line =~ regexp
     end
   end                           # class Line
 end                             # module Orgmode

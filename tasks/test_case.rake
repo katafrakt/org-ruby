@@ -1,11 +1,11 @@
-require 'org-ruby'
+require "org-ruby"
 
 namespace :testcase do
   @data_directory = File.join(File.dirname(__FILE__), "../spec/html_examples")
-  
+
   desc "List all of the current HTML test cases"
   task :list do
-    org_files = File.expand_path(File.join(@data_directory, "*.org" ))
+    org_files = File.expand_path(File.join(@data_directory, "*.org"))
     files = Dir.glob(org_files)
     files.each do |file|
       puts File.basename(file, ".org")
@@ -24,9 +24,7 @@ namespace :testcase do
     puts "\n\n=== ACCEPTING OUTPUT: ===>>>\n\n"
     p = Orgmode::Parser.new(data)
     puts p.to_html
-    File.open(oname, "w") do |s|
-      s.write(p.to_html)
-    end
+    File.write(oname, p.to_html)
   end
 
   desc "Look at the current org-ruby output for a test case"
@@ -48,7 +46,7 @@ namespace :testcase do
 
     desc "List all of the current HTML test cases"
     task :list do
-      org_files = File.expand_path(File.join(@code_syntax_examples_directory, "*.org" ))
+      org_files = File.expand_path(File.join(@code_syntax_examples_directory, "*.org"))
       files = Dir.glob(org_files)
       files.each do |file|
         puts File.basename(file, ".org")
@@ -69,9 +67,7 @@ namespace :testcase do
       puts "\n\n=== ACCEPTING OUTPUT: ===>>>\n\n"
       p = Orgmode::Parser.new(data)
       puts p.to_html
-      File.open(oname, "w") do |s|
-        s.write(p.to_html)
-      end
+      File.write(oname, p.to_html)
     end
 
     desc "Inspect code syntax highlight support"
@@ -89,8 +85,7 @@ namespace :testcase do
       puts p.to_html
     end
   end
-
 end
 
 desc "Alias for testcase:list"
-task :testcase => ["testcase:list"]
+task testcase: ["testcase:list"]

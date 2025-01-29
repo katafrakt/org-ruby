@@ -1,5 +1,5 @@
 begin
-  require 'tilt'
+  require "tilt"
 
   module Tilt
     class OrgTemplate < Template
@@ -8,7 +8,7 @@ begin
       end
 
       def initialize_engine
-        require 'org-ruby'
+        require "org-ruby"
       end
 
       def prepare
@@ -22,8 +22,7 @@ begin
     end
   end
 
-  Tilt.register Tilt::OrgTemplate, 'org'
-
+  Tilt.register Tilt::OrgTemplate, "org"
 rescue LoadError
   # Tilt is not available.
 end

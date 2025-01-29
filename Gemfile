@@ -3,15 +3,17 @@ source "https://rubygems.org"
 gemspec
 
 group :development, :test do
-  gem 'rake'
-  gem 'rspec', '>= 3'
-  gem 'tilt'
+  gem "rake"
+  gem "rspec", ">= 3"
+  gem "tilt"
 end
 
 group :coderay do
-  gem 'coderay'
+  gem "coderay"
 end
 
 group :pygments do
-  gem 'pygments.rb'
+  gem "pygments.rb"
 end
+
+gem "standard", "~> 1.44"

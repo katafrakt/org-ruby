@@ -1,9 +1,7 @@
-require 'stringio'
+require "stringio"
 
 module Orgmode
-
   class MarkdownOutputBuffer < OutputBuffer
-
     def initialize(output, opts = {})
       super(output)
       @options = opts
@@ -15,12 +13,12 @@ module Orgmode
       end
     end
 
-    def push_mode(mode, indent, properties={})
-      super(mode, indent, properties)
+    def push_mode(mode, indent, properties = {})
+      super
     end
 
     def pop_mode(mode = nil)
-      m = super(mode)
+      m = super
       @list_indent_stack.pop
       m
     end
@@ -42,19 +40,19 @@ module Orgmode
         "#{m}#{body}#{m}"
       end
       @re_help.rewrite_subp input do |type, text|
-        if type == "_" then
+        if type == "_"
           "<sub>#{text}</sub>"
-        elsif type == "^" then
+        elsif type == "^"
           "<sup>#{text}</sup>"
         end
       end
       @re_help.rewrite_links input do |link, defi|
         # We don't add a description for images in links, because its
         # empty value forces the image to be inlined.
-        defi ||= link unless link =~ @re_help.org_image_file_regexp
+        defi ||= link unless link&.match?(@re_help.org_image_file_regexp)
         link = link.gsub(/ /, "%%20")
 
-        if defi =~ @re_help.org_image_file_regexp
+        if defi&.match?(@re_help.org_image_file_regexp)
           "![#{defi}](#{defi})"
         elsif defi
           "[#{defi}](#{link})"
@@ -65,30 +63,28 @@ module Orgmode
 
       # Just reuse Textile special symbols for now?
       Orgmode.special_symbols_to_textile(input)
-      input = @re_help.restore_code_snippets input
-      input
+      @re_help.restore_code_snippets input
     end
 
     # TODO: Implement this
     def output_footnotes!
-      return false
+      false
     end
 
     # Flushes the current buffer
     def flush!
-      return false if @buffer.empty? and @output_type != :blank
+      return false if @buffer.empty? && (@output_type != :blank)
       @logger.debug "FLUSH ==========> #{@output_type}"
       @buffer.gsub!(/\A\n*/, "")
 
-      case
-      when mode_is_code?(current_mode)
+      if mode_is_code?(current_mode)
         @output << "```#{@block_lang}\n"
         @output << @buffer << "\n"
         @output << "```\n"
-      when preserve_whitespace?
+      elsif preserve_whitespace?
         @output << @buffer << "\n"
 
-      when @output_type == :blank
+      elsif @output_type == :blank
         @output << "\n"
 
       else
