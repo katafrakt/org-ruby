@@ -30,7 +30,7 @@ To work they have to be separated, like ♥ ♥, not like ♥\hearts.
 # Script to generate the list of currently supported entities
 require 'org-ruby'
 
-Orgmode::HtmlEntities.each_pair do |entity, _|
+OrgRuby::HtmlEntities.each_pair do |entity, _|
   puts "- Writing =\\#{entity}=, results in: \\#{entity}"
 end
 ```

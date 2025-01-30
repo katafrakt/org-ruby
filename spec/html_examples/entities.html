@@ -24,7 +24,7 @@
 # Script to generate the list of currently supported entities
 require &#39;org-ruby&#39;
 
-Orgmode::HtmlEntities.each_pair do |entity, _|
+OrgRuby::HtmlEntities.each_pair do |entity, _|
   puts &quot;- Writing =\\#{entity}=, results in: \\#{entity}&quot;
 end
 </pre>

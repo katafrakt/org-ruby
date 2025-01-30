@@ -1,4 +1,4 @@
-module Orgmode
+module OrgRuby
   class HtmlOutputBuffer < OutputBuffer
     HtmlBlockTag = {
       paragraph: "p",
@@ -354,7 +354,7 @@ module Orgmode
       end
 
       escape_string! str
-      Orgmode.special_symbols_to_html str
+      OrgRuby.special_symbols_to_html str
       @re_help.restore_code_snippets str
     end
 
@@ -422,4 +422,4 @@ module Orgmode
       string.gsub(/['&\"<>]/, TABLE_FOR_ESCAPE_HTML__)
     end
   end                           # class HtmlOutputBuffer
-end                             # module Orgmode
+end                             # module OrgRuby

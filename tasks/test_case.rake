@@ -22,7 +22,7 @@ namespace :testcase do
     puts "=== #{fname} is:          ===>>>\n\n"
     puts data
     puts "\n\n=== ACCEPTING OUTPUT: ===>>>\n\n"
-    p = Orgmode::Parser.new(data)
+    p = OrgRuby::Parser.new(data)
     puts p.to_html
     File.write(oname, p.to_html)
   end
@@ -36,7 +36,7 @@ namespace :testcase do
     puts "=== #{fname} is:          ===>>>\n\n"
     puts data
     puts "\n\n=== #{fname} converts to: ===>>>\n\n"
-    p = Orgmode::Parser.new(data)
+    p = OrgRuby::Parser.new(data)
     puts p.to_html
   end
 
@@ -65,7 +65,7 @@ namespace :testcase do
       puts "=== #{fname} is:          ===>>>\n\n"
       puts data
       puts "\n\n=== ACCEPTING OUTPUT: ===>>>\n\n"
-      p = Orgmode::Parser.new(data)
+      p = OrgRuby::Parser.new(data)
       puts p.to_html
       File.write(oname, p.to_html)
     end
@@ -81,7 +81,7 @@ namespace :testcase do
       puts "=== #{fname} is:          ===>>>\n\n"
       puts data
       puts "\n\n=== #{fname} converts to: ===>>>\n\n"
-      p = Orgmode::Parser.new(data)
+      p = OrgRuby::Parser.new(data)
       puts p.to_html
     end
   end

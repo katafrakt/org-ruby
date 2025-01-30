@@ -1,6 +1,6 @@
 require "stringio"
 
-module Orgmode
+module OrgRuby
   class MarkdownOutputBuffer < OutputBuffer
     def initialize(output, opts = {})
       super(output)
@@ -62,7 +62,7 @@ module Orgmode
       end
 
       # Just reuse Textile special symbols for now?
-      Orgmode.special_symbols_to_textile(input)
+      OrgRuby.special_symbols_to_textile(input)
       @re_help.restore_code_snippets input
     end
 
@@ -109,4 +109,4 @@ module Orgmode
       @output << " "
     end
   end                           # class MarkdownOutputBuffer
-end                             # module Orgmode
+end                             # module OrgRuby

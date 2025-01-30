@@ -1,6 +1,6 @@
 require "logger"
 
-module Orgmode
+module OrgRuby
   # The OutputBuffer is used to accumulate multiple lines of orgmode
   # text, and then emit them to the output all in one go. The class
   # will do the final textile substitution for inline formatting and
@@ -147,7 +147,7 @@ module Orgmode
 
     def load_custom_markup
       require "yaml"
-      filter = instance_of?(::Orgmode::MarkdownOutputBuffer) ? "^MarkdownMap$" : "^HtmlBlockTag$|^Tags$"
+      filter = instance_of?(::OrgRuby::MarkdownOutputBuffer) ? "^MarkdownMap$" : "^HtmlBlockTag$|^Tags$"
       @custom_blocktags = YAML.load_file(@options[:markup_file]).select { |k| k.to_s.match(filter) }
     end
 
@@ -158,7 +158,7 @@ module Orgmode
     end
 
     def no_valid_markup_found
-      tags = instance_of?(::Orgmode::MarkdownOutputBuffer) ? "MarkdownMap" : "HtmlBlockTag or Tags"
+      tags = instance_of?(::OrgRuby::MarkdownOutputBuffer) ? "MarkdownMap" : "HtmlBlockTag or Tags"
       @logger.debug "Setting Custom Markup failed. No #{tags} key where found in: #{@options[:markup_file]}."
       @logger.debug "Continuing export with default markup."
     end
@@ -294,4 +294,4 @@ module Orgmode
       false
     end
   end                           # class OutputBuffer
-end                             # module Orgmode
+end                             # module OrgRuby

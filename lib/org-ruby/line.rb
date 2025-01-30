@@ -1,4 +1,4 @@
-module Orgmode
+module OrgRuby
   # Represents a single line of an orgmode file.
   class Line
     # The indent level of this line. this is important to properly translate
@@ -412,4 +412,4 @@ module Orgmode
       @line =~ regexp
     end
   end                           # class Line
-end                             # module Orgmode
+end                             # module OrgRuby

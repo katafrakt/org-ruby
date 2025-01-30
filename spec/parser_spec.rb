@@ -1,57 +1,57 @@
 require "spec_helper"
 require "pathname"
 
-describe Orgmode::Parser do
+describe OrgRuby::Parser do
   it "should open ORG files" do
-    Orgmode::Parser.load(RememberFile)
+    OrgRuby::Parser.load(RememberFile)
   end
 
   it "should fail on non-existant files" do
-    expect { Orgmode::Parser.load("does-not-exist.org") }.to raise_error
+    expect { OrgRuby::Parser.load("does-not-exist.org") }.to raise_error
   end
 
   it "should load all of the lines" do
-    parser = Orgmode::Parser.load(RememberFile)
+    parser = OrgRuby::Parser.load(RememberFile)
     expect(parser.lines.length).to eql(53)
   end
 
   it "should find all headlines" do
-    parser = Orgmode::Parser.load(RememberFile)
+    parser = OrgRuby::Parser.load(RememberFile)
     expect(parser.headlines.count).to eq(12)
   end
 
   it "can find a headline by index" do
-    parser = Orgmode::Parser.load(RememberFile)
+    parser = OrgRuby::Parser.load(RememberFile)
     line = parser.headlines[1].to_s
     expect(line).to eql("** YAML header in Webby\n")
   end
 
   it "should determine headline levels" do
-    parser = Orgmode::Parser.load(RememberFile)
+    parser = OrgRuby::Parser.load(RememberFile)
     expect(parser.headlines[0].level).to eql(1)
     expect(parser.headlines[1].level).to eql(2)
   end
 
   it "should include the property drawer items from a headline" do
-    parser = Orgmode::Parser.load(FreeformExampleFile)
+    parser = OrgRuby::Parser.load(FreeformExampleFile)
     expect(parser.headlines.first.property_drawer.count).to eq(2)
     expect(parser.headlines.first.property_drawer["DATE"]).to eq("2009-11-26")
     expect(parser.headlines.first.property_drawer["SLUG"]).to eq("future-ideas")
   end
 
   it "should put body lines in headlines" do
-    parser = Orgmode::Parser.load(RememberFile)
+    parser = OrgRuby::Parser.load(RememberFile)
     expect(parser.headlines[0].body_lines.count).to eq(1)
     expect(parser.headlines[1].body_lines.count).to eq(7)
   end
 
   it "should understand lines before the first headline" do
-    parser = Orgmode::Parser.load(FreeformFile)
+    parser = OrgRuby::Parser.load(FreeformFile)
     expect(parser.header_lines.count).to eq(22)
   end
 
   it "should load in-buffer settings" do
-    parser = Orgmode::Parser.load(FreeformFile)
+    parser = OrgRuby::Parser.load(FreeformFile)
     expect(parser.in_buffer_settings.count).to eq(12)
     expect(parser.in_buffer_settings["TITLE"]).to eql("Freeform")
     expect(parser.in_buffer_settings["EMAIL"]).to eql("bdewey@gmail.com")
@@ -59,7 +59,7 @@ describe Orgmode::Parser do
   end
 
   it "should understand OPTIONS" do
-    parser = Orgmode::Parser.load(FreeformFile)
+    parser = OrgRuby::Parser.load(FreeformFile)
     expect(parser.options.count).to eq(33)
     expect(parser.options["TeX"]).to eql("t")
     expect(parser.options["todo"]).to eql("t")
@@ -104,19 +104,19 @@ describe Orgmode::Parser do
   end
 
   it "should skip in-buffer settings inside EXAMPLE blocks" do
-    parser = Orgmode::Parser.load(FreeformExampleFile)
+    parser = OrgRuby::Parser.load(FreeformExampleFile)
     expect(parser.in_buffer_settings.count).to eq(0)
   end
 
   it "should return a textile string" do
-    parser = Orgmode::Parser.load(FreeformFile)
+    parser = OrgRuby::Parser.load(FreeformFile)
     expect(parser.to_textile).to be_kind_of(String)
   end
 
   it "should understand export table option" do
     fname = File.join(File.dirname(__FILE__), %w[html_examples skip-table.org])
     data = IO.read(fname)
-    p = Orgmode::Parser.new(data)
+    p = OrgRuby::Parser.new(data)
     expect(p.export_tables?).to be false
   end
 
@@ -129,14 +129,14 @@ describe Orgmode::Parser do
       echo 'hello world'
       #+end_src
     EXAMPLE
-    o = Orgmode::Parser.new(example)
+    o = OrgRuby::Parser.new(example)
     h = o.headlines.first
     line = h.body_lines.find { |l| l.to_s == "#+begin_src sh :results output" }
     expect(line.properties["block_name"]).to eq("hello_world")
   end
 
   context "with a table that begins with a separator line" do
-    let(:parser) { Orgmode::Parser.new(data) }
+    let(:parser) { OrgRuby::Parser.new(data) }
     let(:data) { Pathname.new(File.dirname(__FILE__)).join("data", "tables.org").read }
 
     it "should parse without errors" do
@@ -146,7 +146,7 @@ describe Orgmode::Parser do
 
   describe "Custom keyword parser" do
     fname = File.join(File.dirname(__FILE__), %w[html_examples custom-todo.org])
-    p = Orgmode::Parser.load(fname)
+    p = OrgRuby::Parser.load(fname)
     valid_keywords = %w[TODO INPROGRESS WAITING DONE CANCELED]
     invalid_keywords = %w[TODOX todo inprogress Waiting done cANCELED NEXT |]
     valid_keywords.each do |kw|
@@ -166,7 +166,7 @@ describe Orgmode::Parser do
 
   describe "Custom include/exclude parser" do
     fname = File.join(File.dirname(__FILE__), %w[html_examples export-tags.org])
-    p = Orgmode::Parser.load(fname)
+    p = OrgRuby::Parser.load(fname)
     it "should load tags" do
       expect(p.export_exclude_tags.count).to eq(2)
       expect(p.export_select_tags.count).to eq(1)
@@ -185,7 +185,7 @@ describe Orgmode::Parser do
       it "should convert #{basename}.org to Textile" do
         expected = IO.read(textile_name)
         expect(expected).to be_kind_of(String)
-        parser = Orgmode::Parser.new(IO.read(file))
+        parser = OrgRuby::Parser.new(IO.read(file))
         actual = parser.to_textile
         expect(actual).to be_kind_of(String)
         expect(actual).to eq(expected)
@@ -196,7 +196,7 @@ describe Orgmode::Parser do
   describe "Make it possible to disable rubypants pass" do
     it "should allow the raw dash" do
       org = "This is a dash -- that will remain as is."
-      parser = Orgmode::Parser.new(org, {skip_rubypants_pass: true})
+      parser = OrgRuby::Parser.new(org, {skip_rubypants_pass: true})
       expected = "<p>#{org}</p>\n"
       expect(expected).to eq(parser.to_html)
     end
@@ -216,7 +216,7 @@ describe Orgmode::Parser do
       it "should convert #{basename}.org to HTML" do
         expected = IO.read(textile_name)
         expect(expected).to be_kind_of(String)
-        parser = Orgmode::Parser.new(IO.read(file), {allow_include_files: true})
+        parser = OrgRuby::Parser.new(IO.read(file), {allow_include_files: true})
         actual = parser.to_html
         expect(actual).to be_kind_of(String)
         expect(actual).to eq(expected)
@@ -235,7 +235,7 @@ describe Orgmode::Parser do
       data_directory = File.join(File.dirname(__FILE__), "html_examples")
       expected = File.read(File.join(data_directory, "include-file-disabled.html"))
       org_file = File.join(data_directory, "include-file.org")
-      parser = Orgmode::Parser.new(IO.read(org_file), allow_include_files: false)
+      parser = OrgRuby::Parser.new(IO.read(org_file), allow_include_files: false)
       actual = parser.to_html
       expect(actual).to eq(expected)
     end
@@ -245,7 +245,7 @@ describe Orgmode::Parser do
       ENV["ORG_RUBY_INCLUDE_ROOT"] = data_directory
       expected = File.read(File.join(data_directory, "include-file.html"))
       org_file = File.join(data_directory, "include-file.org")
-      parser = Orgmode::Parser.new(IO.read(org_file))
+      parser = OrgRuby::Parser.new(IO.read(org_file))
       actual = parser.to_html
       expect(actual).to eq(expected)
       ENV["ORG_RUBY_INCLUDE_ROOT"] = nil
@@ -267,7 +267,7 @@ describe Orgmode::Parser do
       it "should convert #{basename}.org to HTML" do
         expected = IO.read(org_filename)
         expect(expected).to be_kind_of(String)
-        parser = Orgmode::Parser.new(IO.read(file), {
+        parser = OrgRuby::Parser.new(IO.read(file), {
           allow_include_files: true,
           skip_syntax_highlight: true
         })
@@ -310,7 +310,7 @@ describe Orgmode::Parser do
           it "should convert #{basename}.org to HTML" do
             expected = IO.read(org_filename)
             expect(expected).to be_kind_of(String)
-            parser = Orgmode::Parser.new(IO.read(file), allow_include_files: true)
+            parser = OrgRuby::Parser.new(IO.read(file), allow_include_files: true)
             actual = parser.to_html
             expect(actual).to be_kind_of(String)
             expect(actual).to eq(expected)
@@ -340,7 +340,7 @@ describe Orgmode::Parser do
       it "should convert #{basename}.org to Markdown" do
         expected = IO.read(markdown_name)
         expect(expected).to be_kind_of(String)
-        parser = Orgmode::Parser.new(IO.read(file), allow_include_files: false)
+        parser = OrgRuby::Parser.new(IO.read(file), allow_include_files: false)
         actual = parser.to_markdown
         expect(actual).to be_kind_of(String)
         expect(actual).to eq(expected)
@@ -364,7 +364,7 @@ describe Orgmode::Parser do
       it "should convert #{basename}.org to Markdown with the default markup" do
         expected = IO.read(default_html_name)
         expect(expected).to be_kind_of(String)
-        parser = Orgmode::Parser.new(IO.read(file), {allow_include_files: true, markup_file: custom_markup_file})
+        parser = OrgRuby::Parser.new(IO.read(file), {allow_include_files: true, markup_file: custom_markup_file})
         actual = parser.to_markdown
         expect(actual).to be_kind_of(String)
         expect(actual).to eq(expected)
@@ -388,7 +388,7 @@ describe Orgmode::Parser do
       it "should convert #{basename}.org to Markdown with the default markup" do
         expected = IO.read(default_html_name)
         expect(expected).to be_kind_of(String)
-        parser = Orgmode::Parser.new(IO.read(file), {allow_include_files: true, markup_file: custom_markup_file})
+        parser = OrgRuby::Parser.new(IO.read(file), {allow_include_files: true, markup_file: custom_markup_file})
         actual = parser.to_markdown
         expect(actual).to be_kind_of(String)
         expect(actual).to eq(expected)
@@ -410,7 +410,7 @@ describe Orgmode::Parser do
       it "should convert #{basename}.org to Markdown with custom markup" do
         expected = IO.read(markdown_name)
         expect(expected).to be_kind_of(String)
-        parser = Orgmode::Parser.new(IO.read(file), {allow_include_files: false, markup_file: custom_markup_file})
+        parser = OrgRuby::Parser.new(IO.read(file), {allow_include_files: false, markup_file: custom_markup_file})
         actual = parser.to_markdown
         expect(actual).to be_kind_of(String)
         expect(actual).to eq(expected)
@@ -434,7 +434,7 @@ describe Orgmode::Parser do
       it "should convert #{basename}.org to HTML with the default markup" do
         expected = IO.read(default_html_name)
         expect(expected).to be_kind_of(String)
-        parser = Orgmode::Parser.new(IO.read(file), {allow_include_files: true, markup_file: custom_markup_file})
+        parser = OrgRuby::Parser.new(IO.read(file), {allow_include_files: true, markup_file: custom_markup_file})
         actual = parser.to_html
         expect(actual).to be_kind_of(String)
         expect(actual).to eq(expected)
@@ -458,7 +458,7 @@ describe Orgmode::Parser do
       it "should convert #{basename}.org to HTML with the default markup" do
         expected = IO.read(default_html_name)
         expect(expected).to be_kind_of(String)
-        parser = Orgmode::Parser.new(IO.read(file), {allow_include_files: true, markup_file: custom_markup_file})
+        parser = OrgRuby::Parser.new(IO.read(file), {allow_include_files: true, markup_file: custom_markup_file})
         actual = parser.to_html
         expect(actual).to be_kind_of(String)
         expect(actual).to eq(expected)
@@ -480,7 +480,7 @@ describe Orgmode::Parser do
       it "should convert #{basename}.org to HTML with custom markup" do
         expected = IO.read(custom_html_name)
         expect(expected).to be_kind_of(String)
-        parser = Orgmode::Parser.new(IO.read(file), {allow_include_files: true, markup_file: custom_markup_file})
+        parser = OrgRuby::Parser.new(IO.read(file), {allow_include_files: true, markup_file: custom_markup_file})
         actual = parser.to_html
         expect(actual).to be_kind_of(String)
         expect(actual).to eq(expected)
