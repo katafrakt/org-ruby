@@ -15,7 +15,7 @@ def run_html_output_benchmark(n=30)
     
     x.report('html conversion') do
       n.times do
-        Orgmode::Parser.new(org_content).to_html
+        OrgRuby::Parser.new(org_content).to_html
       end
     end
   end
@@ -25,7 +25,7 @@ def run_parsing_file_benchmark(n=30)
   puts "Parsing #{n} times"
   x.report('textile conversion') do
     n.times do
-      Orgmode::Parser.load('bench.org')
+      OrgRuby::Parser.load('bench.org')
     end
   end
 end

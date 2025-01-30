@@ -1,8 +1,8 @@
 require "spec_helper"
 
-describe Orgmode::RegexpHelper do
+describe OrgRuby::RegexpHelper do
   it "should recognize simple markup" do
-    e = Orgmode::RegexpHelper.new
+    e = OrgRuby::RegexpHelper.new
     total = 0
     e.match_all("/italic/") do |border, string|
       expect(border).to eql("/")
@@ -24,7 +24,7 @@ describe Orgmode::RegexpHelper do
   end
 
   it "should not get confused by links" do
-    e = Orgmode::RegexpHelper.new
+    e = OrgRuby::RegexpHelper.new
     total = 0
     # Make sure the slashes in these links aren't treated as italics
     e.match_all("[[http://www.bing.com/twitter]]") do |border, str|
@@ -34,7 +34,7 @@ describe Orgmode::RegexpHelper do
   end
 
   it "should correctly perform substitutions" do
-    e = Orgmode::RegexpHelper.new
+    e = OrgRuby::RegexpHelper.new
     map = {
       "*" => "strong",
       "/" => "i",
@@ -49,7 +49,7 @@ describe Orgmode::RegexpHelper do
   end
 
   it "should allow link rewriting" do
-    e = Orgmode::RegexpHelper.new
+    e = OrgRuby::RegexpHelper.new
     str = e.rewrite_links("[[http://www.bing.com]]") do |link, text|
       text ||= link
       "\"#{text}\":#{link}"
@@ -62,7 +62,7 @@ describe Orgmode::RegexpHelper do
   end
 
   it "should allow quotes within code markup" do
-    e = Orgmode::RegexpHelper.new
+    e = OrgRuby::RegexpHelper.new
     map = {
       "~" => "code"
     }
@@ -73,4 +73,4 @@ describe Orgmode::RegexpHelper do
 
     expect(n).to eql("This string contains a quote using code markup: <code>\"</code>")
   end
-end                             # describe Orgmode::RegexpHelper
+end                             # describe OrgRuby::RegexpHelper

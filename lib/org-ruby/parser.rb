@@ -1,6 +1,6 @@
 require "rubypants"
 
-module Orgmode
+module OrgRuby
   ##
   ##  Simple routines for loading / saving an ORG file.
   ##
@@ -108,10 +108,10 @@ module Orgmode
       # - setting an ORG_RUBY_ENABLE_INCLUDE_FILES env variable to 'true'
       # - setting an ORG_RUBY_INCLUDE_ROOT env variable with the root path
       # - explicitly enabling it by passing it as an option:
-      #   e.g. Orgmode::Parser.new(org_text, { :allow_include_files => true })
+      #   e.g. OrgRuby::Parser.new(org_text, { :allow_include_files => true })
       #
       # IMPORTANT: To avoid the feature altogether, it can be _explicitly disabled_ as follows:
-      #   e.g. Orgmode::Parser.new(org_text, { :allow_include_files => false })
+      #   e.g. OrgRuby::Parser.new(org_text, { :allow_include_files => false })
       #
       if @parser_options[:allow_include_files].nil?
         if (ENV["ORG_RUBY_ENABLE_INCLUDE_FILES"] == "true") \
@@ -154,7 +154,7 @@ module Orgmode
           if line.include_file? && !line.include_file_path.nil?
             next if !check_include_file line.include_file_path
             include_data = get_include_data line
-            include_lines = Orgmode::Parser.new(include_data, @parser_options).lines
+            include_lines = OrgRuby::Parser.new(include_data, @parser_options).lines
             parse_lines include_lines
           end
         end
@@ -463,4 +463,4 @@ module Orgmode
       end
     end
   end                             # class Parser
-end                               # module Orgmode
+end                               # module OrgRuby

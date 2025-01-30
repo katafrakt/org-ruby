@@ -1,6 +1,6 @@
 require "stringio"
 
-module Orgmode
+module OrgRuby
   class TextileOutputBuffer < OutputBuffer
     def initialize(output)
       super
@@ -91,7 +91,7 @@ module Orgmode
 
         "[#{@footnotes.index(footnote)}]"
       end
-      Orgmode.special_symbols_to_textile(input)
+      OrgRuby.special_symbols_to_textile(input)
       @re_help.restore_code_snippets input
     end
 
@@ -147,4 +147,4 @@ module Orgmode
       @output << "h#{headline.level}. "
     end
   end                           # class TextileOutputBuffer
-end                             # module Orgmode
+end                             # module OrgRuby

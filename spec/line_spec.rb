@@ -1,16 +1,16 @@
 require "spec_helper"
 
-describe Orgmode::Line do
+describe OrgRuby::Line do
   it "should tell comments" do
     comments = ["# hello", " # hello"]
     comments.each do |c|
-      line = Orgmode::Line.new c
+      line = OrgRuby::Line.new c
       expect(line.comment?).to be_truthy
     end
 
     not_comments = ["", "\n", "hello\n", "  foo ### bar\n"]
     not_comments.each do |c|
-      line = Orgmode::Line.new c
+      line = OrgRuby::Line.new c
       expect(line.comment?).to be_falsy
     end
   end
@@ -18,14 +18,14 @@ describe Orgmode::Line do
   it "should tell blank lines" do
     blank = ["", " ", "\t", "\n", "  \t\t\n\n"]
     blank.each do |b|
-      line = Orgmode::Line.new b
+      line = OrgRuby::Line.new b
       expect(line.blank?).to be_truthy
     end
   end
 
   [": inline", " : inline", "\t\t:\tinline"].each do |inline_example|
     it "should recognize this inline example: #{inline_example}" do
-      expect(Orgmode::Line.new(inline_example).inline_example?).to be_truthy
+      expect(OrgRuby::Line.new(inline_example).inline_example?).to be_truthy
     end
   end
 
@@ -37,45 +37,45 @@ describe Orgmode::Line do
     " 2) "]
   list_formats.each do |list|
     it "should recognize this list format: '#{list}'" do
-      line = Orgmode::Line.new list
+      line = OrgRuby::Line.new list
       expect(line.plain_list?).to be_truthy
     end
   end
 
   ["-foo", "+foo", "1.foo", "2.foo"].each do |invalid_list|
     it "should not recognize this invalid list: '#{invalid_list}'" do
-      line = Orgmode::Line.new invalid_list
+      line = OrgRuby::Line.new invalid_list
       expect(line.plain_list?).to be_falsy
     end
   end
 
   it "should recognize horizontal rules" do
-    expect(Orgmode::Line.new("-----").horizontal_rule?).to be_truthy
-    expect(Orgmode::Line.new("----------").horizontal_rule?).to be_truthy
-    expect(Orgmode::Line.new("   \t ----- \t\t\t").horizontal_rule?).to be_truthy
-    expect(Orgmode::Line.new("----").horizontal_rule?).to be_falsy
+    expect(OrgRuby::Line.new("-----").horizontal_rule?).to be_truthy
+    expect(OrgRuby::Line.new("----------").horizontal_rule?).to be_truthy
+    expect(OrgRuby::Line.new("   \t ----- \t\t\t").horizontal_rule?).to be_truthy
+    expect(OrgRuby::Line.new("----").horizontal_rule?).to be_falsy
   end
 
   it "should recognize table rows" do
-    expect(Orgmode::Line.new("| One   | Two   | Three |").table_row?).to be_truthy
-    expect(Orgmode::Line.new("  |-------+-------+-------|\n").table_separator?).to be_truthy
-    expect(Orgmode::Line.new("| Four  | Five  | Six   |").table_row?).to be_truthy
-    expect(Orgmode::Line.new("| Seven | Eight | Nine  |").table_row?).to be_truthy
+    expect(OrgRuby::Line.new("| One   | Two   | Three |").table_row?).to be_truthy
+    expect(OrgRuby::Line.new("  |-------+-------+-------|\n").table_separator?).to be_truthy
+    expect(OrgRuby::Line.new("| Four  | Five  | Six   |").table_row?).to be_truthy
+    expect(OrgRuby::Line.new("| Seven | Eight | Nine  |").table_row?).to be_truthy
   end
 
   it "should recognize indentation" do
-    expect(Orgmode::Line.new("").indent).to eql(0)
-    expect(Orgmode::Line.new(" a").indent).to eql(1)
-    expect(Orgmode::Line.new("   ").indent).to eql(0)
-    expect(Orgmode::Line.new("   \n").indent).to eql(0)
-    expect(Orgmode::Line.new("   a").indent).to eql(3)
+    expect(OrgRuby::Line.new("").indent).to eql(0)
+    expect(OrgRuby::Line.new(" a").indent).to eql(1)
+    expect(OrgRuby::Line.new("   ").indent).to eql(0)
+    expect(OrgRuby::Line.new("   \n").indent).to eql(0)
+    expect(OrgRuby::Line.new("   a").indent).to eql(3)
   end
 
   it "should return paragraph type" do
-    expect(Orgmode::Line.new("").paragraph_type).to eql(:blank)
-    expect(Orgmode::Line.new("1. foo").paragraph_type).to eql(:list_item)
-    expect(Orgmode::Line.new("- [ ] checkbox").paragraph_type).to eql(:list_item)
-    expect(Orgmode::Line.new("hello!").paragraph_type).to eql(:paragraph)
+    expect(OrgRuby::Line.new("").paragraph_type).to eql(:blank)
+    expect(OrgRuby::Line.new("1. foo").paragraph_type).to eql(:list_item)
+    expect(OrgRuby::Line.new("- [ ] checkbox").paragraph_type).to eql(:list_item)
+    expect(OrgRuby::Line.new("hello!").paragraph_type).to eql(:paragraph)
   end
 
   it "should recognize BEGIN and END comments" do
@@ -92,13 +92,13 @@ describe Orgmode::Line do
     }
 
     begin_examples.each_key do |str|
-      line = Orgmode::Line.new str
+      line = OrgRuby::Line.new str
       expect(line.begin_block?).to be_truthy
       expect(line.block_type).to eql(begin_examples[str])
     end
 
     end_examples.each_key do |str|
-      line = Orgmode::Line.new str
+      line = OrgRuby::Line.new str
       expect(line.end_block?).to be_truthy
       expect(line.block_type).to eql(end_examples[str])
     end
@@ -125,7 +125,7 @@ describe Orgmode::Line do
 
     cases.each_pair do |example, expected|
       it "should recognize #{example}" do
-        line = Orgmode::Line.new example
+        line = OrgRuby::Line.new example
         expect(line.block_header_arguments).to eq(expected)
       end
     end
@@ -143,7 +143,7 @@ describe Orgmode::Line do
 
     cases.each_pair do |example, expected|
       it "should accept '#{example}' with assigned type #{expected}" do
-        line = Orgmode::Line.new(example, nil, expected)
+        line = OrgRuby::Line.new(example, nil, expected)
         expect(line.assigned_paragraph_type).to eq(expected)
       end
     end
@@ -157,7 +157,7 @@ describe Orgmode::Line do
       "#+A:" => {key: "A", value: ""} # Boundary: Smallest keyword is one letter
     }
     cases.each_pair do |key, value|
-      l = Orgmode::Line.new key
+      l = OrgRuby::Line.new key
       expect(l.in_buffer_setting?).to be_truthy
       called = nil
       l.in_buffer_setting? do |k, v|
@@ -179,7 +179,7 @@ describe Orgmode::Line do
     ]
 
     cases.each do |c|
-      l = Orgmode::Line.new c
+      l = OrgRuby::Line.new c
       expect(l.in_buffer_setting?).to be_nil
     end
   end
@@ -195,21 +195,21 @@ describe Orgmode::Line do
     ]
     cases.each do |c|
       it "should recognize #{c}" do
-        l = Orgmode::Line.new(c).start_of_results_code_block?
+        l = OrgRuby::Line.new(c).start_of_results_code_block?
         expect(l).to be_truthy
       end
     end
   end
 
   it "should recognize an included file" do
-    expect(Orgmode::Line.new("#+INCLUDE: \"~/somefile.org\"").include_file?).to be_truthy
+    expect(OrgRuby::Line.new("#+INCLUDE: \"~/somefile.org\"").include_file?).to be_truthy
   end
 
   it "should recognize an included file with specific lines" do
-    expect(Orgmode::Line.new("#+INCLUDE: \"~/somefile.org\" :lines \"4-18\"").include_file?).to be_truthy
+    expect(OrgRuby::Line.new("#+INCLUDE: \"~/somefile.org\" :lines \"4-18\"").include_file?).to be_truthy
   end
 
   it "should recognize an included code file" do
-    expect(Orgmode::Line.new("#+INCLUDE: \"~/somefile.org\" src ruby").include_file?).to be_truthy
+    expect(OrgRuby::Line.new("#+INCLUDE: \"~/somefile.org\" src ruby").include_file?).to be_truthy
   end
 end

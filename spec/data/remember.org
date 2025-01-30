@@ -33,7 +33,7 @@ http://technet.microsoft.com/en-us/dd565807.aspx
 ** MikTeX
 
    Get it here: http://www.miktex.org/portable/
-** Orgmode publishing tutorial
+** OrgRuby publishing tutorial
 
    [[http://orgmode.org/worg/org-tutorials/org-publish-html-tutorial.php][Publishing Org-mode files to HTML]]
 ** Git and Live Mesh

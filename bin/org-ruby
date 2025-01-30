@@ -43,7 +43,7 @@ begin
     puts options_parser
   else
     data = IO.read(ARGV[0])
-    p = Orgmode::Parser.new(data, (options[:markup_file] ? {:markup_file => options[:markup_file]} : {}))
+    p = OrgRuby::Parser.new(data, (options[:markup_file] ? {:markup_file => options[:markup_file]} : {}))
     $DEBUG = true if options[:debug]
     puts p.to_html if options[:format] == :html
     puts p.to_textile if options[:format] == :textile

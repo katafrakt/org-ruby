@@ -1,6 +1,6 @@
 require "logger"
 
-module Orgmode
+module OrgRuby
   # = Summary
   #
   # This class contains helper routines to deal with the Regexp "black
@@ -194,4 +194,4 @@ module Orgmode
       @org_image_file_regexp = /\.(gif|jpe?g|p(?:bm|gm|n[gm]|pm)|svgz?|tiff?|x[bp]m)/i
     end
   end                           # class Emphasis
-end                             # module Orgmode
+end                             # module OrgRuby

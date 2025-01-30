@@ -4,7 +4,7 @@ begin
   module Tilt
     class OrgTemplate < Template
       def self.engine_initialized?
-        defined? ::Orgmode
+        defined? ::OrgRuby
       end
 
       def initialize_engine
@@ -12,7 +12,7 @@ begin
       end
 
       def prepare
-        @engine = Orgmode::Parser.new(data)
+        @engine = OrgRuby::Parser.new(data)
         @output = nil
       end
 

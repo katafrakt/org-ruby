@@ -1,4 +1,4 @@
-module Orgmode
+module OrgRuby
   # Represents a headline in an orgmode file.
   class Headline < Line
     # This is the "level" of the headline
@@ -99,4 +99,4 @@ module Orgmode
       end
     end
   end                           # class Headline
-end                             # class Orgmode
+end                             # class OrgRuby
