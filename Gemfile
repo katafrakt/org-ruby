@@ -5,6 +5,7 @@ gemspec
 group :development, :test do
   gem "rake"
   gem "rspec", ">= 3"
+  gem "rspec-snapshot"
   gem "tilt"
 end
 
