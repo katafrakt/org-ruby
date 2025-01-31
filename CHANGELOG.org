@@ -1,0 +1,2 @@
+* 0.10.0 (not released)
+This is a technical version. It includes a bunch of reorganization around code and tests in preparations for some actual functionality tests. It should be on par with 0.9.12 version of the original ~org-ruby~.
